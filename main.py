@@ -77,35 +77,6 @@ def rm(input_from_user):
         print("No such file or directory")
 
 
-def mvb(users_input):
-    result = users_input.split(' ')
-    try:
-        old_name = result[1]
-        new_name = result[2]
-        list_of_content = os.listdir()
-        content_of_destination_folder = os.listdir(new_name)
-        print('old name is', old_name)
-        print(list_of_content)
-        if new_name in list_of_content or old_name in content_of_destination_folder:
-            print('The file or directory already exists')
-        if old_name in list_of_content:
-            print(old_name, 'it is in the file')
-        if os.path.isfile(old_name):
-            print('renamed', old_name, 'to', new_name)
-        if os.path.isfile(old_name) and not os.path.isdir(new_name):
-            os.rename(old_name, new_name)
-            print('renamed', old_name, 'to', new_name)
-            #print('one file')
-        if os.path.isfile(old_name) and os.path.isdir(new_name):
-            print('file and directory')
-        #else:
-        #    os.rename(old_name, new_name)
-    except IndexError:
-        print('Specify the current name of the file or directory and the new location and/or name')
-    except FileNotFoundError:
-        print('No such file or directory')
-
-
 def mv(users_input):
     result = users_input.split(' ')
     try:
