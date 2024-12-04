@@ -69,12 +69,51 @@ def lslh():
 def rm(input_from_user):
     result = input_from_user.split(' ')
     file_name = result[-1]
+    list_of_content = os.listdir()
+    if file_name.startswith('.'):
+        count = 0
+        file_extention = file_name
+        for file in list_of_content:
+            if file.endswith(file_extention):
+                os.remove(file)
+                count += 1
+        if count == 0:
+            print('File extension', file_extention, 'not found in this directory')
     if os.path.isfile(file_name):
         os.remove(file_name)
-    elif os.path.isdir(file_name):
+    if os.path.isdir(file_name):
         shutil.rmtree(file_name)
-    else:
+    elif file_name not in list_of_content and not file_name.startswith('.'):
         print("No such file or directory")
+
+
+def mvb(users_input):
+    result = users_input.split(' ')
+    try:
+        old_name = result[1]
+        new_name = result[2]
+        list_of_content = os.listdir()
+        content_of_destination_folder = os.listdir(new_name)
+        print('old name is', old_name)
+        print(list_of_content)
+        if new_name in list_of_content or old_name in content_of_destination_folder:
+            print('The file or directory already exists')
+        if old_name in list_of_content:
+            print(old_name, 'it is in the file')
+        if os.path.isfile(old_name):
+            print('renamed', old_name, 'to', new_name)
+        if os.path.isfile(old_name) and not os.path.isdir(new_name):
+            os.rename(old_name, new_name)
+            print('renamed', old_name, 'to', new_name)
+            #print('one file')
+        if os.path.isfile(old_name) and os.path.isdir(new_name):
+            print('file and directory')
+        #else:
+        #    os.rename(old_name, new_name)
+    except IndexError:
+        print('Specify the current name of the file or directory and the new location and/or name')
+    except FileNotFoundError:
+        print('No such file or directory')
 
 
 def mv(users_input):
@@ -82,21 +121,17 @@ def mv(users_input):
     try:
         old_name = result[1]
         new_name = result[2]
-        list_of_content = os.listdir()
-        if old_name not in list_of_content:
-                print('No such file or directory')
         if os.path.isfile(old_name) and not os.path.isdir(new_name):
             list_of_content = os.listdir()
             if new_name in list_of_content:
                 print('The file or directory already exists')
-
             else:
                 os.rename(old_name, new_name)
         if os.path.isdir(new_name):
             shutil.move(old_name, new_name)
 
     except IndexError:
-        print('Specify the current name of the file or directory and the new location and/or name')
+        print('Specify the current name of the file or directory and the new name')
     except FileNotFoundError:
         print('No such file or directory')
 
