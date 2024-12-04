@@ -1,5 +1,6 @@
 import os
 import shutil
+import shlex
 
 
 def change_directory(input_from_user):
@@ -76,18 +77,55 @@ def rm(input_from_user):
         print("No such file or directory")
 
 
+def mvb(users_input):
+    result = users_input.split(' ')
+    try:
+        old_name = result[1]
+        new_name = result[2]
+        list_of_content = os.listdir()
+        content_of_destination_folder = os.listdir(new_name)
+        print('old name is', old_name)
+        print(list_of_content)
+        if new_name in list_of_content or old_name in content_of_destination_folder:
+            print('The file or directory already exists')
+        if old_name in list_of_content:
+            print(old_name, 'it is in the file')
+        if os.path.isfile(old_name):
+            print('renamed', old_name, 'to', new_name)
+        if os.path.isfile(old_name) and not os.path.isdir(new_name):
+            os.rename(old_name, new_name)
+            print('renamed', old_name, 'to', new_name)
+            #print('one file')
+        if os.path.isfile(old_name) and os.path.isdir(new_name):
+            print('file and directory')
+        #else:
+        #    os.rename(old_name, new_name)
+    except IndexError:
+        print('Specify the current name of the file or directory and the new location and/or name')
+    except FileNotFoundError:
+        print('No such file or directory')
+
+
 def mv(users_input):
     result = users_input.split(' ')
     try:
         old_name = result[1]
         new_name = result[2]
         list_of_content = os.listdir()
-        if new_name in list_of_content:
-            print('The file or directory already exists')
-        else:
-            os.rename(old_name, new_name)
+        if old_name not in list_of_content:
+                print('No such file or directory')
+        if os.path.isfile(old_name) and not os.path.isdir(new_name):
+            list_of_content = os.listdir()
+            if new_name in list_of_content:
+                print('The file or directory already exists')
+
+            else:
+                os.rename(old_name, new_name)
+        if os.path.isdir(new_name):
+            shutil.move(old_name, new_name)
+
     except IndexError:
-        print('Specify the current name of the file or directory and the new name')
+        print('Specify the current name of the file or directory and the new location and/or name')
     except FileNotFoundError:
         print('No such file or directory')
 
@@ -99,6 +137,31 @@ def mkdir(input_from_user):
         os.mkdir(directory)
     except FileExistsError:
         print('The directory already exists')
+
+
+def cp(input_from_user):
+    result = shlex.split(input_from_user)
+    try:
+
+        file_path = result[1]
+        dst_folder = result[2]
+        split_file = file_path.split('/')
+        file = split_file[-1]
+        content_of_current_folder = os.listdir()
+        content_of_destination_folder = os.listdir(dst_folder)
+
+        if file not in content_of_current_folder:
+            print('No such file or directory')
+        elif file in content_of_destination_folder:
+            print(file, 'already exists in this directory')
+        else:
+            shutil.copy(file_path, dst_folder)
+    except IndexError:
+        print('Specify the current name of the file or directory and the new location and/or name')
+    except IsADirectoryError:
+        print('Specify the current name of the file or directory and the new location and/or name')
+    except FileNotFoundError:
+        print('No such file or directory')
 
 
 os.chdir('/Users/alyona/PycharmProjects/File Manager/File Manager/task/module/root_folder')
@@ -127,12 +190,16 @@ while True:
     elif inp.startswith('rm '):
         rm(inp)
     elif inp == 'mv':
-        print('Specify the current name of the file or directory and the new name')
+        print('Specify the current name of the file or directory and the new location and/or name')
     elif inp.startswith('mv '):
         mv(inp)
     elif inp == 'mkdir':
         print('Specify the name of the directory to be made')
     elif inp.startswith('mkdir '):
         mkdir(inp)
+    elif inp == 'cp':
+        print('Specify the file')
+    elif inp.startswith('cp '):
+        cp(inp)
     else:
         print('Invalid command')
