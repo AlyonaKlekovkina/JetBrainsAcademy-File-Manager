@@ -87,42 +87,17 @@ def rm(input_from_user):
         print("No such file or directory")
 
 
-def mvb(users_input):
+def mv1(users_input):
     result = users_input.split(' ')
     try:
         old_name = result[1]
         new_name = result[2]
         list_of_content = os.listdir()
-        content_of_destination_folder = os.listdir(new_name)
-        print('old name is', old_name)
-        print(list_of_content)
-        if new_name in list_of_content or old_name in content_of_destination_folder:
-            print('The file or directory already exists')
-        if old_name in list_of_content:
-            print(old_name, 'it is in the file')
-        if os.path.isfile(old_name):
-            print('renamed', old_name, 'to', new_name)
+        if old_name.startswith('.'):
+            mv(old_name, new_name)
+        if old_name not in list_of_content:
+            print('No such file or directory')
         if os.path.isfile(old_name) and not os.path.isdir(new_name):
-            os.rename(old_name, new_name)
-            print('renamed', old_name, 'to', new_name)
-            #print('one file')
-        if os.path.isfile(old_name) and os.path.isdir(new_name):
-            print('file and directory')
-        #else:
-        #    os.rename(old_name, new_name)
-    except IndexError:
-        print('Specify the current name of the file or directory and the new location and/or name')
-    except FileNotFoundError:
-        print('No such file or directory')
-
-
-def mv(users_input):
-    result = users_input.split(' ')
-    try:
-        old_name = result[1]
-        new_name = result[2]
-        if os.path.isfile(old_name) and not os.path.isdir(new_name):
-            list_of_content = os.listdir()
             if new_name in list_of_content:
                 print('The file or directory already exists')
             else:
@@ -131,9 +106,25 @@ def mv(users_input):
             shutil.move(old_name, new_name)
 
     except IndexError:
-        print('Specify the current name of the file or directory and the new name')
+        print('Specify the current name of the file or directory and the new location and/or name')
     except FileNotFoundError:
         print('No such file or directory')
+
+
+def mv(old_name, new_name):
+    try:
+        list_of_content = os.listdir()
+        if old_name not in list_of_content:
+            print('File extension', old_name, 'not found in this directory')
+            content_of_destination_folder = os.listdir(new_name)
+            for file in list_of_content:
+                if file.endswith(old_name):
+                    if file in content_of_destination_folder:
+                        process_existing_file_move(file, new_name)
+                    else:
+                        shutil.move(file, new_name)
+    except FileNotFoundError:
+        print('File extension', old_name, 'not found in this directory')
 
 
 def mkdir(input_from_user):
@@ -145,20 +136,54 @@ def mkdir(input_from_user):
         print('The directory already exists')
 
 
+def process_existing_file(file_name, target):
+    while True:
+        print(file_name, 'already exists in this directory. Replace? (y/n)')
+        inp = input()
+        if inp == 'y':
+            shutil.copy(file_name, target)
+            break
+        elif inp == 'n':
+            break
+
+
+def process_existing_file_move(file, target):
+    while True:
+        print(file, 'already exists in this directory. Replace? (y/n)')
+        inp = input()
+        if inp == 'y':
+            os.remove(os.path.join(target, file))
+            shutil.move(file, target)
+            break
+        elif inp == 'n':
+            break
+
+
 def cp(input_from_user):
     result = shlex.split(input_from_user)
     try:
-
         file_path = result[1]
         dst_folder = result[2]
         split_file = file_path.split('/')
         file = split_file[-1]
         content_of_current_folder = os.listdir()
         content_of_destination_folder = os.listdir(dst_folder)
+        if file_path.startswith('.'):
+            count = 0
+            for fl in content_of_current_folder:
+                if fl.endswith(file_path):
+                    if fl in content_of_destination_folder:
+                        process_existing_file(fl, dst_folder)
+                        count += 1
+                    else:
+                        shutil.copy(fl, dst_folder)
+                        count += 1
+            if count == 0:
+                print('File extension', file_path, 'not found in this directory')
 
-        if file not in content_of_current_folder:
+        elif file not in content_of_current_folder and not file_path.startswith('.'):
             print('No such file or directory')
-        elif file in content_of_destination_folder:
+        elif file in content_of_destination_folder and not file_path.startswith('.'):
             print(file, 'already exists in this directory')
         else:
             shutil.copy(file_path, dst_folder)
@@ -198,7 +223,7 @@ while True:
     elif inp == 'mv':
         print('Specify the current name of the file or directory and the new location and/or name')
     elif inp.startswith('mv '):
-        mv(inp)
+        mv1(inp)
     elif inp == 'mkdir':
         print('Specify the name of the directory to be made')
     elif inp.startswith('mkdir '):
